@@ -1,0 +1,46 @@
+// Copyright XiaoYao
+
+#pragma once
+
+#include "Nodes/NarrativeNode.h"
+#include "NarrativeNode_ExecutionMultiGate.generated.h"
+
+/**
+ * Executes a series of pins in order
+ */
+UCLASS(NotBlueprintable, meta = (DisplayName = "Multi Gate", Keywords = "series, loop, random"))
+class NARRATIVE_API UNarrativeNode_ExecutionMultiGate final : public UNarrativeNode
+{
+	GENERATED_UCLASS_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "MultiGate")
+	bool bRandom;
+
+	// Allow executing output pins again, without triggering Reset pin
+	// If set to False, every output pin can be triggered only once
+	UPROPERTY(EditAnywhere, Category = "MultiGate")
+	bool bLoop;
+
+	UPROPERTY(EditAnywhere, Category = "MultiGate")
+	int32 StartIndex;
+
+private:
+	UPROPERTY(SaveGame)
+	int32 NextOutput;
+
+	UPROPERTY(SaveGame)
+	TArray<bool> Completed;
+
+public:
+#if WITH_EDITOR
+	virtual bool CanUserAddOutput() const override { return true; }
+#endif
+
+protected:
+	virtual void ExecuteInput(const FName& PinName) override;
+	virtual void Cleanup() override;
+
+#if WITH_EDITOR
+	virtual FString GetNodeDescription() const override;
+#endif
+};
